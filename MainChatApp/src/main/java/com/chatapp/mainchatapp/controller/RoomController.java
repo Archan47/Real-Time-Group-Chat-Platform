@@ -3,7 +3,6 @@ package com.chatapp.mainchatapp.controller;
 
 import com.chatapp.mainchatapp.dto.RoomRequest;
 import com.chatapp.mainchatapp.entity.Message;
-import com.chatapp.mainchatapp.entity.Room;
 import com.chatapp.mainchatapp.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
