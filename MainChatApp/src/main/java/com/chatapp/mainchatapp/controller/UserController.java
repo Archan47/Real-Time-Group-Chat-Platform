@@ -1,4 +1,6 @@
 package com.chatapp.mainchatapp.controller;
 
-public class UserContrroller {
+public class UserController {
+
+
 }
