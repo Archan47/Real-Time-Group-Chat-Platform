@@ -7,9 +7,9 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.management.relation.Role;
 import java.time.LocalDateTime;
+
+
 
 @Document(collection = "users")
 @Getter
@@ -27,6 +27,8 @@ public class User {
     @Indexed(unique = true)
     private String email;
     private String password;
+
+    private String profilePicUrl;
 
     private String verifyOtp;
     private LocalDateTime verifyOtpExpireAt;

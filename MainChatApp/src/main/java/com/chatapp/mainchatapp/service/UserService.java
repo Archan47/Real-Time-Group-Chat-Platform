@@ -1,38 +1,50 @@
 package com.chatapp.mainchatapp.service;
 
+import com.chatapp.mainchatapp.dto.RegisterRequest;
+import com.chatapp.mainchatapp.dto.RegisterResponse;
+import com.chatapp.mainchatapp.entity.Role;
 import com.chatapp.mainchatapp.entity.User;
 import com.chatapp.mainchatapp.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
+@Service
 public class UserService {
 
-    public ResponseEntity<User> getUserByUserId;
     @Autowired
     private UserRepo userRepo;
 
-    public ResponseEntity<List<User>> geAllUsers() {
-        try{
-            return new ResponseEntity<>(userRepo.findAll(), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.BAD_REQUEST);
-    }
+    public RegisterResponse createProfile(RegisterRequest registerRequest){
 
+            if (userRepo.findByEmail(registerRequest.getEmail()) != null){
+                throw new RuntimeException("Email Already exists !!");
+            }
 
-    public ResponseEntity<User> getUserByUserId(String userId) {
+            User newUser = new User();
+            newUser.setName(registerRequest.getName());
+            newUser.setEmail(registerRequest.getEmail());
+            newUser.setPassword(registerRequest.getPassword());
+            newUser.setCreatedAt(LocalDateTime.now());
+            newUser.setUpdatedAt(LocalDateTime.now());
+            newUser.setAccountVerified(false);
+            newUser.setVerifyOtp(null);
+            newUser.setResetOtp(null);
+            newUser.setVerifyOtpExpireAt(null);
+            newUser.setResetOtpExpireAt(null);
+            newUser.setEnabled(true);
+            newUser.setRole(Role.USER);
 
-        try{
-            return new ResponseEntity<>(userRepo.findByUserId(userId),HttpStatus.OK);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>(new User(),HttpStatus.BAD_REQUEST);
+            User saveUser = userRepo.save(newUser);
+
+            return RegisterResponse.builder()
+                    .uId(saveUser.getId())
+                    .name(saveUser.getName())
+                    .email(saveUser.getEmail())
+                    .isAccountVerified(saveUser.isAccountVerified())
+                    .build();
     }
 }
