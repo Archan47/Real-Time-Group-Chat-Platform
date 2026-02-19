@@ -50,16 +50,37 @@ public class AdminService {
 
     public ResponseEntity<?> disableUser(String uId) {
 
-        Optional<User> optionalUser = userRepo.findById(uId);
+        Optional<User> optionalUserForDisable = userRepo.findById(uId);
 
-        if (optionalUser.isEmpty()){
+        if (optionalUserForDisable.isEmpty()){
             return new ResponseEntity<>("User not found",HttpStatus.NOT_FOUND);
         }
+        if (!optionalUserForDisable.get().isEnabled()) {
+            return new ResponseEntity<>("User is already disabled",HttpStatus.OK);
+        }
 
-        User user = optionalUser.get();
+        User user = optionalUserForDisable.get();
         user.setEnabled(false);
         userRepo.save(user);
 
         return new ResponseEntity<>(user.getName() + ", you are disabled by Admin",HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> enableUser(String uId) {
+
+        Optional<User> optionalUserForEnable = userRepo.findById(uId);
+
+        if (optionalUserForEnable.isEmpty()){
+            return new ResponseEntity<>("User not found",HttpStatus.NOT_FOUND);
+        }
+        if (optionalUserForEnable.get().isEnabled()){
+            return new ResponseEntity<>("User is already Enabled",HttpStatus.OK);
+        }
+
+        User user = optionalUserForEnable.get();
+        user.setEnabled(true);
+        userRepo.save(user);
+
+        return new ResponseEntity<>(user.getName() + ", you are enabled by Admin",HttpStatus.OK);
     }
 }

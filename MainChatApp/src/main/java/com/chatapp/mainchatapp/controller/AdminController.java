@@ -40,4 +40,10 @@ public class AdminController {
     public ResponseEntity<?> disableUser(@PathVariable String uId){
         return adminService.disableUser(uId);
     }
+
+
+    @PutMapping("enable-user/{uId}")
+    public ResponseEntity<?> enableUser(@PathVariable String uId){
+        return adminService.enableUser(uId);
+    }
 }
