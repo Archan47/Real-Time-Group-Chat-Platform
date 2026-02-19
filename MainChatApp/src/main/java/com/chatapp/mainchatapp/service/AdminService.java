@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -45,5 +46,20 @@ public class AdminService {
             throw new RuntimeException("User not found with id : " + uId);
         }
         userRepo.deleteById(uId);
+    }
+
+    public ResponseEntity<?> disableUser(String uId) {
+
+        Optional<User> optionalUser = userRepo.findById(uId);
+
+        if (optionalUser.isEmpty()){
+            return new ResponseEntity<>("User not found",HttpStatus.NOT_FOUND);
+        }
+
+        User user = optionalUser.get();
+        user.setEnabled(false);
+        userRepo.save(user);
+
+        return new ResponseEntity<>(user.getName() + ", you are disabled by Admin",HttpStatus.OK);
     }
 }

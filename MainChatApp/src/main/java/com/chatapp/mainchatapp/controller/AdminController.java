@@ -35,4 +35,9 @@ public class AdminController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PutMapping("disable-user/{uId}")
+    public ResponseEntity<?> disableUser(@PathVariable String uId){
+        return adminService.disableUser(uId);
+    }
 }
