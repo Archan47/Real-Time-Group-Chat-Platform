@@ -1,6 +1,7 @@
 package com.chatapp.mainchatapp.controller;
 
 
+import com.chatapp.mainchatapp.dto.JoinRoomRequest;
 import com.chatapp.mainchatapp.dto.RoomRequest;
 import com.chatapp.mainchatapp.entity.Message;
 import com.chatapp.mainchatapp.service.RoomService;
@@ -22,9 +23,9 @@ public class RoomController {
         return roomService.createRoom(request);
     }
 
-    @GetMapping("/join/{roomId}")
-    public ResponseEntity<?> joinRoom(@PathVariable String roomId){
-        return roomService.joinRoom(roomId);
+    @GetMapping("/join")
+    public ResponseEntity<?> joinRoom(@RequestBody JoinRoomRequest roomRequest){
+        return roomService.joinRoom(roomRequest);
     }
 
 

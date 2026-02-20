@@ -1,6 +1,7 @@
 package com.chatapp.mainchatapp.service;
 
 
+import com.chatapp.mainchatapp.dto.JoinRoomRequest;
 import com.chatapp.mainchatapp.dto.RoomRequest;
 import com.chatapp.mainchatapp.entity.Message;
 import com.chatapp.mainchatapp.entity.Room;
@@ -13,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RoomService {
@@ -44,9 +44,18 @@ public class RoomService {
         return new ResponseEntity<>("Room Created Successfully",HttpStatus.CREATED);
     }
 
-    public ResponseEntity<?> joinRoom(String roomId) {
+    public ResponseEntity<?> joinRoom(JoinRoomRequest roomRequest) {
+
+        User user = userRepo.findById(roomRequest.getUserId()).
+                orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.isEnabled()){
+            return new ResponseEntity<>(user.getName()+", You are Blocked By Monitoring Team for Offensive act\n" +
+                    "You can not join in Rooms",
+                    HttpStatus.FORBIDDEN);
+        }
         
-        Room room = roomRepository.findByRoomId(roomId);
+        Room room = roomRepository.findByRoomId(roomRequest.getRoomId());
 
         try{
             if (room != null){
@@ -57,6 +66,9 @@ public class RoomService {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room not Found !!");
     }
+
+
+
 
     public ResponseEntity<List<Message>> getMessages(String roomId, int page, int size) {
 
