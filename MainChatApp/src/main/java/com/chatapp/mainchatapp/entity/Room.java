@@ -21,6 +21,11 @@ public class Room {
 
     private String roomId;
 
+    private String createdBy;  // Room Admin
+    private boolean isPrivate; // public / private group
+    private String category;   // Sports / Education etc
+    private String purpose;    // why room created
+
     private List<Message> messages = new ArrayList<>();
 
 }

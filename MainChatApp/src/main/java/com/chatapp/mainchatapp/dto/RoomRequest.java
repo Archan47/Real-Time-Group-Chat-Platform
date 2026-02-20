@@ -7,5 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RoomRequest {
+
     private String roomId;
+    private String userId;
+
 }

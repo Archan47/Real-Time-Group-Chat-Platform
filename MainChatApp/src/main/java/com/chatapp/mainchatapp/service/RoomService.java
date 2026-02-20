@@ -4,29 +4,44 @@ package com.chatapp.mainchatapp.service;
 import com.chatapp.mainchatapp.dto.RoomRequest;
 import com.chatapp.mainchatapp.entity.Message;
 import com.chatapp.mainchatapp.entity.Room;
+import com.chatapp.mainchatapp.entity.User;
 import com.chatapp.mainchatapp.repo.RoomRepository;
+import com.chatapp.mainchatapp.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RoomService {
 
     @Autowired
     private RoomRepository roomRepository;
+    @Autowired
+    private UserRepo userRepo;
 
 
     public ResponseEntity<?> createRoom(RoomRequest request) {
+
+        User user = userRepo.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User Not found"));
+
+        if (!user.isEnabled()){
+            return new ResponseEntity<>(user.getName()+", You are Blocked By Monitoring Team for Offensive act",
+                    HttpStatus.FORBIDDEN);
+        }
+
         if (roomRepository.findByRoomId(request.getRoomId()) != null){
             return ResponseEntity.badRequest().body("Room already exists!");
         }
         Room room = new Room();
         room.setRoomId(request.getRoomId());
-        Room savedRoom = roomRepository.save(room);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedRoom);
+        room.setCreatedBy(request.getUserId());
+        roomRepository.save(room);
+        return new ResponseEntity<>("Room Created Successfully",HttpStatus.CREATED);
     }
 
     public ResponseEntity<?> joinRoom(String roomId) {
