@@ -6,6 +6,7 @@ import com.chatapp.mainchatapp.entity.AppUser;
 import com.chatapp.mainchatapp.entity.Role;
 import com.chatapp.mainchatapp.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,8 @@ public class UserService {
 
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     public RegisterResponse createProfile(RegisterRequest registerRequest){
@@ -26,7 +29,7 @@ public class UserService {
             AppUser newAppUser = new AppUser();
             newAppUser.setName(registerRequest.getName());
             newAppUser.setEmail(registerRequest.getEmail());
-            newAppUser.setPassword(registerRequest.getPassword());
+            newAppUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
             newAppUser.setCreatedAt(LocalDateTime.now());
             newAppUser.setUpdatedAt(LocalDateTime.now());
             newAppUser.setAccountVerified(false);

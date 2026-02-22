@@ -12,6 +12,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -27,55 +28,43 @@ public class JwtFilter extends OncePerRequestFilter {
     private final AppUserDetailsService appUserDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain)
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
 
         String token = null;
-        String username = null;
-        String role = null;
+        String email = null;
 
-        // 1️⃣ Check if header exists and starts with Bearer
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            username = jwtUtil.extractUsername(token);
-            role = jwtUtil.extractRole(token);
+            email = jwtUtil.extractUsername(token);
         }
 
-        // 2️⃣ If username found & not already authenticated
-        if (username != null &&
-                SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            var userDetails =
-                    appUserDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = appUserDetailsService.loadUserByUsername(email);
 
-            if (jwtUtil.validateToken(token, username)) {
-
-                var authorities = List.of(
-                        new SimpleGrantedAuthority("ROLE_" + role)
-                );
+            if (jwtUtil.validateToken(token, userDetails.getUsername())) {
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
-                                authorities
+                                userDetails.getAuthorities()
                         );
 
                 authToken.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
+                        new WebAuthenticationDetailsSource().buildDetails(request)
                 );
 
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authToken);
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 
-        // 3️⃣ Continue filter chain
         filterChain.doFilter(request, response);
     }
 }
