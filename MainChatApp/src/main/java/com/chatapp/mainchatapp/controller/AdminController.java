@@ -1,6 +1,6 @@
 package com.chatapp.mainchatapp.controller;
 
-import com.chatapp.mainchatapp.entity.User;
+import com.chatapp.mainchatapp.entity.AppUser;
 import com.chatapp.mainchatapp.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,12 +17,12 @@ public class AdminController {
 
 
     @GetMapping("/allusers")
-    public ResponseEntity<List<User>> getAllUsers(){
+    public ResponseEntity<List<AppUser>> getAllUsers(){
         return adminService.geAllUsers();
     }
 
     @GetMapping("/getuser/{uId}")
-    public ResponseEntity<User> getUser(@PathVariable String uId){
+    public ResponseEntity<AppUser> getUser(@PathVariable String uId){
         return adminService.getUser(uId);
     }
 

@@ -1,6 +1,6 @@
 package com.chatapp.mainchatapp.service;
 
-import com.chatapp.mainchatapp.entity.User;
+import com.chatapp.mainchatapp.entity.AppUser;
 import com.chatapp.mainchatapp.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +16,7 @@ public class AdminService {
     @Autowired
     private UserRepo userRepo;
 
-    public ResponseEntity<List<User>> geAllUsers() {
+    public ResponseEntity<List<AppUser>> geAllUsers() {
         try{
             return new ResponseEntity<>(userRepo.findAll(), HttpStatus.OK);
         } catch (Exception e) {
@@ -27,12 +27,12 @@ public class AdminService {
     }
 
 
-    public ResponseEntity<User> getUser(String uId) {
+    public ResponseEntity<AppUser> getUser(String uId) {
         try{
-            User user = userRepo.findById(uId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+            AppUser appUser = userRepo.findById(uId)
+                    .orElseThrow(() -> new RuntimeException("AppUser not found"));
 
-            return new ResponseEntity<>(user,HttpStatus.OK);
+            return new ResponseEntity<>(appUser,HttpStatus.OK);
         }
         catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -43,44 +43,44 @@ public class AdminService {
 
     public void deleteUser(String uId) {
         if (!userRepo.existsById(uId)){
-            throw new RuntimeException("User not found with id : " + uId);
+            throw new RuntimeException("AppUser not found with id : " + uId);
         }
         userRepo.deleteById(uId);
     }
 
     public ResponseEntity<?> disableUser(String uId) {
 
-        Optional<User> optionalUserForDisable = userRepo.findById(uId);
+        Optional<AppUser> optionalUserForDisable = userRepo.findById(uId);
 
         if (optionalUserForDisable.isEmpty()){
-            return new ResponseEntity<>("User not found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("AppUser not found",HttpStatus.NOT_FOUND);
         }
         if (!optionalUserForDisable.get().isEnabled()) {
-            return new ResponseEntity<>("User is already disabled",HttpStatus.OK);
+            return new ResponseEntity<>("AppUser is already disabled",HttpStatus.OK);
         }
 
-        User user = optionalUserForDisable.get();
-        user.setEnabled(false);
-        userRepo.save(user);
+        AppUser appUser = optionalUserForDisable.get();
+        appUser.setEnabled(false);
+        userRepo.save(appUser);
 
-        return new ResponseEntity<>(user.getName() + ", you are disabled by Admin",HttpStatus.OK);
+        return new ResponseEntity<>(appUser.getName() + ", you are disabled by Admin",HttpStatus.OK);
     }
 
     public ResponseEntity<?> enableUser(String uId) {
 
-        Optional<User> optionalUserForEnable = userRepo.findById(uId);
+        Optional<AppUser> optionalUserForEnable = userRepo.findById(uId);
 
         if (optionalUserForEnable.isEmpty()){
-            return new ResponseEntity<>("User not found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("AppUser not found",HttpStatus.NOT_FOUND);
         }
         if (optionalUserForEnable.get().isEnabled()){
-            return new ResponseEntity<>("User is already Enabled",HttpStatus.OK);
+            return new ResponseEntity<>("AppUser is already Enabled",HttpStatus.OK);
         }
 
-        User user = optionalUserForEnable.get();
-        user.setEnabled(true);
-        userRepo.save(user);
+        AppUser appUser = optionalUserForEnable.get();
+        appUser.setEnabled(true);
+        userRepo.save(appUser);
 
-        return new ResponseEntity<>(user.getName() + ", you are enabled by Admin",HttpStatus.OK);
+        return new ResponseEntity<>(appUser.getName() + ", you are enabled by Admin",HttpStatus.OK);
     }
 }

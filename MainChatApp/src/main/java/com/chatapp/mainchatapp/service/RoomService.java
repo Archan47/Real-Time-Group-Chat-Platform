@@ -3,9 +3,9 @@ package com.chatapp.mainchatapp.service;
 
 import com.chatapp.mainchatapp.dto.JoinRoomRequest;
 import com.chatapp.mainchatapp.dto.RoomRequest;
+import com.chatapp.mainchatapp.entity.AppUser;
 import com.chatapp.mainchatapp.entity.Message;
 import com.chatapp.mainchatapp.entity.Room;
-import com.chatapp.mainchatapp.entity.User;
 import com.chatapp.mainchatapp.repo.RoomRepository;
 import com.chatapp.mainchatapp.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +26,11 @@ public class RoomService {
 
     public ResponseEntity<?> createRoom(RoomRequest request) {
 
-        User user = userRepo.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User Not found"));
+        AppUser appUser = userRepo.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("AppUser Not found"));
 
-        if (!user.isEnabled()){
-            return new ResponseEntity<>(user.getName()+", You are Blocked By Monitoring Team for Offensive act",
+        if (!appUser.isEnabled()){
+            return new ResponseEntity<>(appUser.getName()+", You are Blocked By Monitoring Team for Offensive act",
                     HttpStatus.FORBIDDEN);
         }
 
@@ -46,11 +46,11 @@ public class RoomService {
 
     public ResponseEntity<?> joinRoom(JoinRoomRequest roomRequest) {
 
-        User user = userRepo.findById(roomRequest.getUserId()).
-                orElseThrow(() -> new RuntimeException("User not found"));
+        AppUser appUser = userRepo.findById(roomRequest.getUserId()).
+                orElseThrow(() -> new RuntimeException("AppUser not found"));
 
-        if (!user.isEnabled()){
-            return new ResponseEntity<>(user.getName()+", You are Blocked By Monitoring Team for Offensive act\n" +
+        if (!appUser.isEnabled()){
+            return new ResponseEntity<>(appUser.getName()+", You are Blocked By Monitoring Team for Offensive act\n" +
                     "You can not join in Rooms",
                     HttpStatus.FORBIDDEN);
         }
