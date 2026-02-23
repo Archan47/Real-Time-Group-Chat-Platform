@@ -1,6 +1,7 @@
 package com.chatapp.mainchatapp.dto;
 
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,9 @@ import lombok.Setter;
 @Setter
 public class RoomRequest {
 
+    @NotNull
     private String roomId;
+    @NotNull
     private String userId;
 
 }

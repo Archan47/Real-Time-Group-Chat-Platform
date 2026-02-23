@@ -1,9 +1,8 @@
 package com.chatapp.mainchatapp.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,6 +11,7 @@ import java.time.LocalDateTime;
 
 
 @Document(collection = "users")
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor
@@ -25,6 +25,7 @@ public class AppUser {
     @Indexed(unique = true)
     private String userId;
     @Indexed(unique = true)
+    @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}",flags = Pattern.Flag.CASE_INSENSITIVE)
     private String email;
     private String password;
 
