@@ -58,6 +58,6 @@ public class UserController {
 
         String token = jwtUtil.generateToken(email, role);
 
-        return ResponseEntity.ok(new LoginResponse(token));
+        return ResponseEntity.ok(new LoginResponse(token,"Welcome Back User"));
     }
 }

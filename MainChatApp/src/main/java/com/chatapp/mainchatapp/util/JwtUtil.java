@@ -12,7 +12,7 @@ import java.util.Date;
 public class JwtUtil {
 
     private final String SECRET =
-            "mysecretkeymysecretkeymysecretkey123";
+            "YOUR_JWT_SECRET_KEY";
 
     private SecretKey getSignKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());

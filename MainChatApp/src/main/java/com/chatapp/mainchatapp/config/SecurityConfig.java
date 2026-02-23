@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -29,6 +30,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final AuthenticationSuccessHandler successHandler;
+
     private final JwtFilter jwtFilter;
 
     private final AppUserDetailsService appUserDetailsService;
@@ -41,8 +44,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/login","/api/users/register","/api/users/send-reset-otp",
                                 "/api/users/reset-password","/api/users/logout")
                         .permitAll().anyRequest().authenticated())
+                .oauth2Login(oAuth2LoginConfigurer ->
+                        oAuth2LoginConfigurer.successHandler(successHandler)
+                                .failureHandler(null)
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(
-                        SessionCreationPolicy.STATELESS))
+                        SessionCreationPolicy.IF_REQUIRED))
                 .userDetailsService(appUserDetailsService)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(AbstractHttpConfigurer::disable);
