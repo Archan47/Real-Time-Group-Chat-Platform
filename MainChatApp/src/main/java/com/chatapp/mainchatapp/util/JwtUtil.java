@@ -3,16 +3,25 @@ package com.chatapp.mainchatapp.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
-    private final String SECRET =
-            "YOUR_JWT_SECRET_KEY";
+    @Value("${jwt.secret}")
+    private String SECRET;
+
+    @Value("${jwt.access.expiration}")
+    private long accessExpiration;
+
+    @Value("${jwt.refresh.expiration}")
+    private long refreshExpiration;
 
     private SecretKey getSignKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
@@ -24,8 +33,22 @@ public class JwtUtil {
                 .subject(username)
                 .claim("role", role)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .expiration(new Date(System.currentTimeMillis() + accessExpiration))
                 .signWith(getSignKey())
+                .compact();
+    }
+
+    public String generateRefreshToken(String username,String jti) {
+
+        Instant now = Instant.now();
+
+        return Jwts.builder()
+                .id(jti)
+                .subject(username)
+                .issuedAt(Date.from(now))
+                .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
+                .signWith(getSignKey())
+                .claim("tvd","refresh")
                 .compact();
     }
 
@@ -42,7 +65,7 @@ public class JwtUtil {
                 && !isTokenExpired(token);
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
 
         return Jwts.parser()
                 .verifyWith(getSignKey())
@@ -51,7 +74,7 @@ public class JwtUtil {
                 .getPayload();
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractAllClaims(token)
                 .getExpiration()
                 .before(new Date());
