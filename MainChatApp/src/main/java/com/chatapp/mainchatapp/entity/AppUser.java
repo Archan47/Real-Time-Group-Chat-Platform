@@ -20,7 +20,6 @@ public class AppUser {
 
     @Id
     private String id;
-    @Indexed(unique = true)
     private String name;
     @Indexed(unique = true)
     private String userId;

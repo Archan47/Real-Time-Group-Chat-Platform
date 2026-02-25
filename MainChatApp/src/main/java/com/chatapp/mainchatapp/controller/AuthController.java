@@ -59,7 +59,7 @@ public class AuthController {
         String refreshToken =
                 jwtUtil.generateRefreshToken(email, refreshTokenEntity.getJti());
 
-        return ResponseEntity.ok(new LoginResponse(accessToken,refreshToken)).getBody();
+        return ResponseEntity.ok(new LoginResponse(accessToken,refreshToken,"Welcome Back User")).getBody();
     }
 
 
@@ -76,7 +76,7 @@ public class AuthController {
         String newAccessToken =
                 jwtUtil.generateToken(username, "ROLE_USER");
 
-        return new LoginResponse(newAccessToken, refreshToken);
+        return new LoginResponse(newAccessToken, refreshToken,"");
     }
 
 

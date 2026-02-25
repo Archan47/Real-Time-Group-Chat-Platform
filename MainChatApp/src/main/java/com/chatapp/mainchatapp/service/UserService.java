@@ -18,6 +18,8 @@ public class UserService {
     private UserRepo userRepo;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private EmailService emailService;
 
 
     public RegisterResponse createProfile(RegisterRequest registerRequest){
@@ -41,6 +43,11 @@ public class UserService {
             newAppUser.setRole(Role.USER);
 
             AppUser saveAppUser = userRepo.save(newAppUser);
+
+            emailService.sendRegistrationMail(
+                    saveAppUser.getEmail(),
+                    saveAppUser.getName()
+            );
 
             return RegisterResponse.builder()
                     .uId(saveAppUser.getId())

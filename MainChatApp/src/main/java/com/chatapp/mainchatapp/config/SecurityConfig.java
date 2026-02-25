@@ -1,5 +1,6 @@
 package com.chatapp.mainchatapp.config;
 import com.chatapp.mainchatapp.service.AppUserDetailsService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -37,24 +38,40 @@ public class SecurityConfig {
     private final AppUserDetailsService appUserDetailsService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
-        httpSecurity.cors(Customizer.withDefaults())
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        http
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/login","/api/users/register","/api/users/send-reset-otp",
-                                "/api/users/reset-password","/api/users/logout")
-                        .permitAll().anyRequest().authenticated())
-                .oauth2Login(oAuth2LoginConfigurer ->
-                        oAuth2LoginConfigurer.successHandler(successHandler)
-                                .failureHandler(null)
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/users/register",
+                                "/api/users/send-reset-otp",
+                                "/api/users/reset-password",
+                                "/api/users/logout",
+                                "/api/admin-panel/**",
+                                "/oauth2/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(
-                        SessionCreationPolicy.IF_REQUIRED))
+                .oauth2Login(oauth ->
+                        oauth.successHandler(successHandler)
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                        })
+                )
                 .userDetailsService(appUserDetailsService)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(AbstractHttpConfigurer::disable);
 
-        return httpSecurity.build();
+        return http.build();
     }
 
     @Bean
