@@ -24,10 +24,11 @@ public class RoomService {
     private UserRepo userRepo;
 
 
+
     public ResponseEntity<?> createRoom(RoomRequest request) {
 
         AppUser appUser = userRepo.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("AppUser Not found"));
+                .orElseThrow(() -> new RuntimeException("User Not found"));
 
         if (!appUser.isEnabled()){
             return new ResponseEntity<>(appUser.getName()+", You are Blocked By Monitoring Team for Offensive act",
@@ -39,7 +40,8 @@ public class RoomService {
         }
         Room room = new Room();
         room.setRoomId(request.getRoomId());
-        room.setCreatedBy(request.getUserId());
+        room.setCreatedBy(appUser.getId());
+        room.setPrivate(request.isPrivateRoom());
         roomRepository.save(room);
         return new ResponseEntity<>("Room Created Successfully",HttpStatus.CREATED);
     }

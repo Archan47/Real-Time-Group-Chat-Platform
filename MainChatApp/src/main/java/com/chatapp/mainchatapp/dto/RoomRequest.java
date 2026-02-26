@@ -13,5 +13,7 @@ public class RoomRequest {
     private String roomId;
     @NotNull
     private String userId;
+    @NotNull
+    private boolean privateRoom;
 
 }
