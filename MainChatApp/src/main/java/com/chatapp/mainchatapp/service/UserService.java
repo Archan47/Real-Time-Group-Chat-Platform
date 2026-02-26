@@ -1,11 +1,14 @@
 package com.chatapp.mainchatapp.service;
 
+import com.chatapp.mainchatapp.dto.PasswordChangeRequest;
 import com.chatapp.mainchatapp.dto.RegisterRequest;
 import com.chatapp.mainchatapp.dto.RegisterResponse;
 import com.chatapp.mainchatapp.entity.AppUser;
 import com.chatapp.mainchatapp.entity.Role;
 import com.chatapp.mainchatapp.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -55,5 +58,68 @@ public class UserService {
                     .email(saveAppUser.getEmail())
                     .isAccountVerified(saveAppUser.isAccountVerified())
                     .build();
+    }
+
+    public void changePassword(PasswordChangeRequest passwordChangeRequest) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        AppUser user = userRepo.findByEmail(email);
+
+        if (user == null){
+            throw new RuntimeException("User not Found");
+        }
+
+        user.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassWord()));
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepo.save(user);
+
+    }
+
+    public void sendPasswordResetOtp(String email) {
+
+        AppUser user = userRepo.findByEmail(email);
+
+        if (user == null){
+            throw new RuntimeException("User not found");
+        }
+
+        String otp = String.valueOf((int)(Math.random() * 900000) + 100000);
+
+        user.setResetOtp(otp);
+        user.setResetOtpExpireAt(LocalDateTime.now().plusMinutes(5));
+
+        userRepo.save(user);
+
+        emailService.sendPasswordResetOtpMail(email,otp);
+    }
+
+
+
+
+    public void verifyPasswordResetOtp(String email, String otp, String newPassword) {
+
+        AppUser user = userRepo.findByEmail(email);
+
+        if (user == null){
+            throw new RuntimeException("User not found");
+        }
+
+        if (user.getResetOtp() == null || !user.getResetOtp().equals(otp)){
+            throw new RuntimeException("Invalid OTP");
+        }
+
+        if (user.getResetOtpExpireAt().isBefore(LocalDateTime.now())){
+            throw new RuntimeException("OTP expired");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetOtp(null);
+        user.setResetOtpExpireAt(null);
+        user.setUpdatedAt(LocalDateTime.now());
+
+        userRepo.save(user);
     }
 }

@@ -3,8 +3,11 @@ package com.chatapp.mainchatapp.controller;
 
 import com.chatapp.mainchatapp.dto.LoginRequest;
 import com.chatapp.mainchatapp.dto.LoginResponse;
+import com.chatapp.mainchatapp.entity.AppUser;
 import com.chatapp.mainchatapp.entity.RefreshToken;
 import com.chatapp.mainchatapp.repo.RefreshTokenRepository;
+import com.chatapp.mainchatapp.repo.UserRepo;
+import com.chatapp.mainchatapp.service.EmailService;
 import com.chatapp.mainchatapp.service.RefreshTokenService;
 import com.chatapp.mainchatapp.util.JwtUtil;
 import jakarta.servlet.http.Cookie;
@@ -19,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +33,9 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
+
+    private final EmailService emailService;
+    private final UserRepo userRepo;
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
@@ -58,6 +65,14 @@ public class AuthController {
         // Generate Refresh JWT
         String refreshToken =
                 jwtUtil.generateRefreshToken(email, refreshTokenEntity.getJti());
+
+        AppUser user = userRepo.findByEmail(email);
+        if (Objects.equals(user.getEmail(), email)) {
+            emailService.sendLoginMail(
+                    email,
+                    user.getName()
+            );
+        }
 
         return ResponseEntity.ok(new LoginResponse(accessToken,refreshToken,"Welcome Back User")).getBody();
     }
