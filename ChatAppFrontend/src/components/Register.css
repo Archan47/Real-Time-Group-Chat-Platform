@@ -1,0 +1,33 @@
+.register {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+}
+
+.register-card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.register-card input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.register-card button {
+  padding: 10px;
+  background: #4e54c8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
