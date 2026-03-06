@@ -1,20 +1,20 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Landing from "./components/landing";
-import Navbar from "./components/Navbar";
 import Register from "./components/Register";
-import Home from "./components/Home";
+import RoomLogin from "./components/RoomLogin";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Home from "./components/Home";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
     <Router>
       <ToastContainer />
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route element={<Navbar/>}/>
+      <Navbar/>
+      <Routes> 
         <Route path="/register" element={<Register />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/roomlogin" element={<RoomLogin />} />
+        <Route path="/" element={<Home/>}/>
       </Routes>
     </Router>
   );
