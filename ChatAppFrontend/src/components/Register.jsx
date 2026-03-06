@@ -134,7 +134,7 @@ function Register() {
         {/* Footer */}
         <p className="register-card__footer">
           Already have an account?
-          <a href="/login">Sign in</a>
+          <a href="/login">Log in</a>
         </p>
       </form>
     </div>

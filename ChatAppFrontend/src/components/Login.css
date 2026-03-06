@@ -10,7 +10,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* ── Full-page background ── */
-.register {
+.login {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -22,8 +22,8 @@
   font-family: 'DM Sans', sans-serif;
 }
 
-/* Background grid */
-.register::before {
+/* Grid overlay */
+.login::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -34,19 +34,29 @@
   pointer-events: none;
 }
 
-/* Floating orbs */
-.register::after {
-  content: '';
+/* Orbs */
+.login__orb-top {
   position: absolute;
   width: 500px; height: 500px;
   background: radial-gradient(circle, rgba(96,72,191,0.18) 0%, transparent 65%);
-  top: -140px; right: -100px;
+  top: -150px; right: -100px;
   border-radius: 50%;
   pointer-events: none;
+  z-index: 0;
+}
+
+.login__orb-bottom {
+  position: absolute;
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, rgba(141,123,255,0.2) 0%, transparent 65%);
+  bottom: -100px; left: -60px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ── Card ── */
-.register-card {
+.login-card {
   position: relative;
   z-index: 2;
   background: rgba(255, 255, 255, 0.72);
@@ -72,8 +82,8 @@
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* ── Logo mark ── */
-.register-card__logo {
+/* ── Logo ── */
+.login-card__logo {
   width: 48px; height: 48px;
   background: var(--violet-deep);
   border-radius: 14px;
@@ -85,7 +95,7 @@
 }
 
 /* ── Headings ── */
-.register-card h2 {
+.login-card h2 {
   font-family: 'Syne', sans-serif;
   font-size: 1.75rem;
   font-weight: 800;
@@ -95,15 +105,72 @@
   animation: cardIn 0.7s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.register-card__subtitle {
+.login-card__subtitle {
   font-size: 0.875rem;
   color: #7a7090;
-  margin-bottom: 2rem;
+  margin-bottom: 1.8rem;
   animation: cardIn 0.7s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* ── Google button ── */
+.login-card__google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.78rem 1rem;
+  background: white;
+  border: 1.5px solid rgba(185,174,255,0.6);
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1a1625;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 1.4rem;
+  animation: cardIn 0.7s 0.12s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.login-card__google-btn:hover {
+  border-color: var(--violet-mid);
+  background: var(--violet-pale);
+  box-shadow: 0 4px 16px rgba(96,72,191,0.12);
+  transform: translateY(-1px);
+}
+
+/* ── Divider ── */
+.login-card__divider {
+  position: relative;
+  text-align: center;
+  margin-bottom: 1.4rem;
+  animation: cardIn 0.7s 0.14s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.login-card__divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0; right: 0;
+  height: 1px;
+  background: rgba(185,174,255,0.5);
+}
+
+.login-card__divider span {
+  position: relative;
+  background: rgba(255,255,255,0.85);
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a09ab8;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 /* ── Input groups ── */
-.register-card__field {
+.login-card__field {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -111,11 +178,16 @@
   animation: cardIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.register-card__field:nth-child(4) { animation-delay: 0.12s; }
-.register-card__field:nth-child(5) { animation-delay: 0.16s; }
-.register-card__field:nth-child(6) { animation-delay: 0.20s; }
+.login-card__field:nth-of-type(1) { animation-delay: 0.16s; }
+.login-card__field:nth-of-type(2) { animation-delay: 0.20s; }
 
-.register-card__field label {
+.login-card__field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.login-card__field label {
   font-size: 0.78rem;
   font-weight: 500;
   color: #4a4060;
@@ -123,22 +195,34 @@
   text-transform: uppercase;
 }
 
-.register-card__input-wrap {
+.login-card__forgot {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--violet-mid);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.login-card__forgot:hover {
+  color: var(--violet-deep);
+  text-decoration: underline;
+}
+
+.login-card__input-wrap {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.register-card__input-wrap svg {
+.login-card__input-wrap svg {
   position: absolute;
   left: 0.9rem;
   color: var(--violet-soft);
   pointer-events: none;
   transition: color 0.2s;
-  flex-shrink: 0;
 }
 
-.register-card input {
+.login-card input {
   width: 100%;
   padding: 0.75rem 0.9rem 0.75rem 2.6rem;
   background: rgba(229, 225, 255, 0.45);
@@ -151,23 +235,18 @@
   transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
 
-.register-card input::placeholder {
-  color: #b0a8c8;
-}
+.login-card input::placeholder { color: #b0a8c8; }
 
-.register-card input:focus {
+.login-card input:focus {
   border-color: var(--violet-mid);
   background: white;
   box-shadow: 0 0 0 3px rgba(141, 123, 255, 0.15);
 }
 
-.register-card input:focus + svg,
-.register-card__input-wrap:focus-within svg {
-  color: var(--violet-mid);
-}
+.login-card__input-wrap:focus-within svg { color: var(--violet-mid); }
 
-/* ── Submit button ── */
-.register-card button[type="submit"] {
+/* ── Submit ── */
+.login-card__submit {
   width: 100%;
   margin-top: 0.5rem;
   padding: 0.85rem;
@@ -188,20 +267,20 @@
   animation: cardIn 0.7s 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.register-card button[type="submit"]:hover:not(:disabled) {
+.login-card__submit:hover:not(:disabled) {
   background: var(--violet-mid);
   box-shadow: 0 6px 24px rgba(141,123,255,0.5);
   transform: translateY(-1px);
 }
 
-.register-card button[type="submit"]:disabled {
+.login-card__submit:disabled {
   opacity: 0.65;
   cursor: not-allowed;
   transform: none;
 }
 
-/* loading spinner */
-.register-card__spinner {
+/* Spinner */
+.login-card__spinner {
   width: 16px; height: 16px;
   border: 2px solid rgba(255,255,255,0.4);
   border-top-color: white;
@@ -209,12 +288,10 @@
   animation: spin 0.7s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Footer link ── */
-.register-card__footer {
+/* ── Footer ── */
+.login-card__footer {
   text-align: center;
   margin-top: 1.4rem;
   font-size: 0.83rem;
@@ -222,25 +299,16 @@
   animation: cardIn 0.7s 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.register-card__footer a {
+.login-card__footer a {
   color: var(--violet-deep);
   font-weight: 500;
   text-decoration: none;
   margin-left: 0.25rem;
 }
 
-.register-card__footer a:hover {
-  text-decoration: underline;
-}
+.login-card__footer a:hover { text-decoration: underline; }
 
-/* ── Bottom orb ── */
-.register__orb-bottom {
-  position: absolute;
-  width: 380px; height: 380px;
-  background: radial-gradient(circle, rgba(141,123,255,0.2) 0%, transparent 65%);
-  bottom: -100px; left: -60px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .login-card { padding: 2.2rem 1.6rem; }
 }
-
