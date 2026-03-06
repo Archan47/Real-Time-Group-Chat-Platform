@@ -4,6 +4,7 @@ package com.chatapp.mainchatapp.controller;
 import com.chatapp.mainchatapp.dto.JoinRoomRequest;
 import com.chatapp.mainchatapp.dto.RoomRequest;
 import com.chatapp.mainchatapp.entity.Message;
+import com.chatapp.mainchatapp.entity.Room;
 import com.chatapp.mainchatapp.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,18 @@ public class RoomController {
 
     {
         return roomService.getMessages(roomId,page,size);
+    }
+
+    // GET all public rooms
+    @GetMapping("/public")
+    public ResponseEntity<List<Room>> getPublicRooms() {
+        return roomService.getPublicRooms();
+    }
+
+    // GET all private rooms (just metadata — no messages exposed)
+    @GetMapping("/private")
+    public ResponseEntity<List<Room>> getPrivateRooms() {
+        return roomService.getPrivateRooms();
     }
 
 

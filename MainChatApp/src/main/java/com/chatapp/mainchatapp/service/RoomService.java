@@ -88,4 +88,17 @@ public class RoomService {
         return ResponseEntity.status(HttpStatus.OK).body(paginatedMessage);
 
     }
+
+        public ResponseEntity<List<Room>> getPublicRooms() {
+            List<Room> rooms = roomRepository.findByIsPrivate(false);
+            // Clear messages so we don't send heavy payloads in the list
+            rooms.forEach(r -> r.setMessages(List.of()));
+            return ResponseEntity.ok(rooms);
+        }
+
+        public ResponseEntity<List<Room>> getPrivateRooms() {
+            List<Room> rooms = roomRepository.findByIsPrivate(true);
+            rooms.forEach(r -> r.setMessages(List.of()));
+            return ResponseEntity.ok(rooms);
+        }
 }

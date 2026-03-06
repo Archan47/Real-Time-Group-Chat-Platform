@@ -1,13 +1,11 @@
 package com.chatapp.mainchatapp.config;
+
 import com.chatapp.mainchatapp.service.AppUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,14 +30,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final AuthenticationSuccessHandler successHandler;
-
     private final JwtFilter jwtFilter;
-
     private final AppUserDetailsService appUserDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
@@ -48,18 +43,22 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/login",
+                                "/api/auth/refresh",
                                 "/api/users/register",
                                 "/api/users/send-reset-otp",
                                 "/api/users/reset-password",
+                                "/api/users/forgot-password",
+                                "/api/users/verify-otp",
                                 "/api/users/logout",
                                 "/api/admin-panel/**",
-                                "/oauth2/**"
+                                "/oauth2/**",
+                                // ✅ Room list endpoints — authenticated via JWT in header
+                                "/chat/room/public",
+                                "/chat/room/private"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth ->
-                        oauth.successHandler(successHandler)
-                )
+                .oauth2Login(oauth -> oauth.successHandler(successHandler))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -75,39 +74,29 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-
     }
 
-
     @Bean
-    public CorsFilter corsFilter(){
+    public CorsFilter corsFilter() {
         return new CorsFilter(corsConfigurationSource());
     }
 
     private CorsConfigurationSource corsConfigurationSource() {
-
         CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.setAllowedOrigins(List.of("http://localhost:5173"));
-        corsConfig.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-        corsConfig.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        corsConfig.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         corsConfig.setAllowCredentials(true);
 
-
-        UrlBasedCorsConfigurationSource urlCorsConfigSource = new UrlBasedCorsConfigurationSource();
-        urlCorsConfigSource.registerCorsConfiguration("/**",corsConfig);
-
-
-        return urlCorsConfigSource;
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfig);
+        return source;
     }
-
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
-
 }
