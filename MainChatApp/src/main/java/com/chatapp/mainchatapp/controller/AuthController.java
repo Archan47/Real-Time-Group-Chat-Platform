@@ -23,8 +23,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.Objects;
-
-@RestController
 @RequiredArgsConstructor
 @RequestMapping("api/auth")
 public class AuthController {

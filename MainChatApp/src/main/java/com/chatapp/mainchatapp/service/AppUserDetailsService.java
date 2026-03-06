@@ -1,6 +1,7 @@
 package com.chatapp.mainchatapp.service;
 
 import com.chatapp.mainchatapp.entity.AppUser;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import com.chatapp.mainchatapp.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,10 +27,14 @@ public class AppUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Email not found: " + email);
         }
 
+        String role = existingUser.getRole() != null
+                ? existingUser.getRole().name()
+                : "USER";
+
         return new User(
                 existingUser.getEmail(),
-                existingUser.getPassword(),
-                new ArrayList<>()
+                existingUser.getPassword() != null ? existingUser.getPassword() : "",
+                List.of(new SimpleGrantedAuthority("ROLE_" + role))
         );
     }
 }
