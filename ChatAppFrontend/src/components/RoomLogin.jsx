@@ -1,24 +1,24 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import CreateRoomModal from "./CreateRoomModal";
 import "./RoomLogin.css";
 
 export default function RoomLogin() {
-  const [name,   setName]   = useState("");
-  const [roomId, setRoomId] = useState("");
-  const navigate = useNavigate();
+  const [name,        setName]        = useState("");
+  const [roomId,      setRoomId]      = useState("");
+  const [showCreate,  setShowCreate]  = useState(false);
+  const navigate     = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Pre-fill roomId if coming from /rooms page
+  useState(() => {
+    const id = searchParams.get("roomId");
+    if (id) setRoomId(id);
+  });
 
   const handleJoin = () => {
     if (!name || !roomId) return;
-    console.log("Joining room:", roomId, "as", name);
-    // navigate(`/chat/${roomId}?name=${name}`);
-  };
-
-  const handleCreate = () => {
-    if (!name) return;
-    const newRoomId = roomId || Math.random().toString(36).substring(2, 8).toUpperCase();
-    setRoomId(newRoomId);
-    console.log("Creating room:", newRoomId, "as", name);
-    // navigate(`/chat/${newRoomId}?name=${name}`);
+    navigate(`/chat/${roomId.trim().toUpperCase()}?name=${encodeURIComponent(name)}`);
   };
 
   return (
@@ -34,7 +34,7 @@ export default function RoomLogin() {
       {/* Card */}
       <div className="rl__card">
 
-        {/* Left panel — branding */}
+        {/* Left panel */}
         <div className="rl__panel">
           <div className="rl__panel-logo">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
@@ -51,25 +51,22 @@ export default function RoomLogin() {
               { icon: "🌍", text: "Share with anyone" },
             ].map((f, i) => (
               <div className="rl__panel-feature" key={i}>
-                <span>{f.icon}</span>
-                <span>{f.text}</span>
+                <span>{f.icon}</span><span>{f.text}</span>
               </div>
             ))}
           </div>
 
-          {/* Decorative chat preview */}
           <div className="rl__panel-preview">
             <div className="rl__preview-msg rl__preview-msg--in">You in? 🚀</div>
             <div className="rl__preview-msg rl__preview-msg--out">Always. Let's go!</div>
           </div>
         </div>
 
-        {/* Right panel — form */}
+        {/* Right panel */}
         <div className="rl__form-panel">
           <h1 className="rl__form-title">Join a room</h1>
           <p className="rl__form-sub">Enter your name and a room ID to get started.</p>
 
-          {/* Name input */}
           <div className="rl__field">
             <label>Your Name</label>
             <div className="rl__input-wrap">
@@ -78,15 +75,12 @@ export default function RoomLogin() {
                 <circle cx="12" cy="7" r="4"/>
               </svg>
               <input
-                type="text"
-                placeholder="e.g. AGENT47"
-                value={name}
-                onChange={e => setName(e.target.value)}
+                type="text" placeholder="e.g. username"
+                value={name} onChange={e => setName(e.target.value)}
               />
             </div>
           </div>
 
-          {/* Room ID input */}
           <div className="rl__field">
             <label>Room ID</label>
             <div className="rl__input-wrap">
@@ -95,15 +89,12 @@ export default function RoomLogin() {
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
               <input
-                type="text"
-                placeholder="e.g. ROOM-XK92"
-                value={roomId}
-                onChange={e => setRoomId(e.target.value)}
+                type="text" placeholder="e.g. TECHROOM"
+                value={roomId} onChange={e => setRoomId(e.target.value.toUpperCase())}
               />
             </div>
           </div>
 
-          {/* Buttons */}
           <div className="rl__buttons">
             <button className="rl__btn rl__btn--join" onClick={handleJoin} disabled={!name || !roomId}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -113,7 +104,7 @@ export default function RoomLogin() {
               </svg>
               Join Room
             </button>
-            <button className="rl__btn rl__btn--create" onClick={handleCreate} disabled={!name}>
+            <button className="rl__btn rl__btn--create" onClick={() => setShowCreate(true)}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <line x1="12" y1="5" x2="12" y2="19"/>
                 <line x1="5" y1="12" x2="19" y2="12"/>
@@ -123,12 +114,20 @@ export default function RoomLogin() {
           </div>
 
           <p className="rl__back">
-            <button onClick={() => navigate("/home")} className="rl__back-btn">
-              ← Back to home
+            <button onClick={() => navigate("/rooms")} className="rl__back-btn">
+              ← Back to rooms
             </button>
           </p>
         </div>
       </div>
+
+      {/* Create Room Modal */}
+      {showCreate && (
+        <CreateRoomModal
+          onClose={() => setShowCreate(false)}
+          onRoomCreated={() => navigate("/rooms")}
+        />
+      )}
     </div>
   );
 }

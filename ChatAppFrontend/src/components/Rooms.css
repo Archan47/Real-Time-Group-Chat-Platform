@@ -469,3 +469,38 @@
   .rooms__private-input-wrap { flex: 1; }
   .rooms__private-input-wrap input { width: 100%; }
 }
+
+/* ── Create Room button (header) ── */
+.rooms__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.rooms__create-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.72rem 1.3rem;
+  background: var(--violet-deep);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 4px 18px rgba(96,72,191,0.35);
+  transition: all 0.22s;
+  flex-shrink: 0;
+  margin-top: 0.5rem;
+}
+
+.rooms__create-btn:hover {
+  background: var(--violet-mid);
+  box-shadow: 0 6px 22px rgba(141,123,255,0.4);
+  transform: translateY(-1px);
+}

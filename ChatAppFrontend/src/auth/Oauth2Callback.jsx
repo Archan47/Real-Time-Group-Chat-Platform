@@ -32,6 +32,7 @@ function OAuth2Callback() {
       // KEY FIX: set a flag so the HOME page shows the toast, not this page
       // This avoids the unmount-before-render issue entirely
       sessionStorage.setItem("pendingToast", "Signed in with Google 🎉");
+      window.dispatchEvent(new Event("auth:update"));
       navigate("/home", { replace: true });
     } else {
       toast.error("Google login failed — no tokens received.");

@@ -17,11 +17,18 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// If 401, clear tokens and redirect to login
+// If 401 on a PROTECTED route, clear tokens and redirect to login
+// But DO NOT redirect on auth endpoints — those handle their own errors
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const url = error.config?.url || "";
+    const isAuthEndpoint =
+      url.includes("/api/auth/login") ||
+      url.includes("/api/auth/refresh") ||
+      url.includes("/api/users/register");
+
+    if (error.response?.status === 401 && !isAuthEndpoint) {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("userPicture");

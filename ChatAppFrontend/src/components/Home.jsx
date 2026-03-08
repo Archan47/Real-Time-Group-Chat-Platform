@@ -17,8 +17,11 @@ export default function Home() {
     const pendingToast = sessionStorage.getItem("pendingToast");
     if (pendingToast) {
       sessionStorage.removeItem("pendingToast");
-      // Small delay so ToastContainer is fully mounted
-      setTimeout(() => toast.success(pendingToast), 100);
+      setTimeout(() => {
+        toast.success(pendingToast);
+        // Re-fire auth event in case Navbar missed the first one
+        window.dispatchEvent(new Event("auth:update"));
+      }, 100);
     }
   }, []);
 
@@ -40,12 +43,12 @@ export default function Home() {
   }, []);
 
   const features = [
-    { icon: "⚡", title: "Real-time Messaging",   desc: "Zero-latency communication powered by WebSocket. Every message arrives instantly." },
-    { icon: "🔒", title: "End-to-End Secure",     desc: "JWT authentication with refresh tokens. Your conversations stay private, always." },
-    { icon: "🚪", title: "Private Rooms",         desc: "Create or join rooms with a unique ID. Full control over who joins your space." },
-    { icon: "🌐", title: "OAuth Login",           desc: "Sign in with Google in one click. No extra passwords to remember." },
-    { icon: "📧", title: "Smart Notifications",   desc: "Email alerts for logins, resets, and new messages — keeping you always in the loop." },
-    { icon: "🎨", title: "Sleek Interface",       desc: "A minimal, distraction-free UI built for focus. Looks great on any device." },
+    { icon: "fa-solid fa-bolt-lightning", title: "Real-time Messaging",   desc: "Zero-latency communication powered by WebSocket. Every message arrives instantly." },
+    { icon: "fa-solid fa-lock",           title: "End-to-End Secure",     desc: "JWT authentication with refresh tokens. Your conversations stay private, always." },
+    { icon: "fa-solid fa-building-lock",  title: "Private Rooms",         desc: "Create or join rooms with a unique ID. Full control over who joins your space." },
+    { icon: "fa-solid fa-circle-check",   title: "OAuth Login",           desc: "Sign in with Google in one click. No extra passwords to remember." },
+    { icon: "fa-solid fa-bell",           title: "Smart Notifications",   desc: "Email alerts for logins, resets, and new messages — keeping you always in the loop." },
+    { icon: "fa-solid fa-display",        title: "Sleek Interface",       desc: "A minimal, distraction-free UI built for focus. Looks great on any device." },
   ];
 
   return (
@@ -164,7 +167,7 @@ export default function Home() {
           <div className="home__features-grid">
             {features.map((f, i) => (
               <div className="home__feature-card" key={i} style={{ animationDelay: `${i * 0.08}s` }}>
-                <div className="home__feature-icon">{f.icon}</div>
+                <div className="home__feature-icon"><i className={f.icon}></i></div>
                 <h3 className="home__feature-title">{f.title}</h3>
                 <p className="home__feature-desc">{f.desc}</p>
               </div>

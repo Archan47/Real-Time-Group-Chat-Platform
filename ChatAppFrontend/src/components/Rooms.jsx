@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import CreateRoomModal from "./CreateRoomModal";
 import "./Rooms.css";
 
 export default function Rooms() {
@@ -11,11 +12,11 @@ export default function Rooms() {
   const [loading,      setLoading]      = useState(true);
   const [tab,          setTab]          = useState("public"); // "public" | "private"
   const [search,       setSearch]       = useState("");
+  const [showCreate,   setShowCreate]   = useState(false);
   const [privateInput, setPrivateInput] = useState("");
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      setLoading(true);
+  const fetchRooms = async () => {
+    setLoading(true);
       try {
         const [pubRes, privRes] = await Promise.all([
           API.get("/chat/room/public"),
@@ -25,12 +26,12 @@ export default function Rooms() {
         setPrivateRooms(privRes.data || []);
       } catch (err) {
         console.error("Failed to fetch rooms:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRooms();
-  }, []);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchRooms(); }, []);
 
   const filtered = (tab === "public" ? publicRooms : privateRooms).filter(r =>
     r.roomId?.toLowerCase().includes(search.toLowerCase()) ||
@@ -210,6 +211,12 @@ export default function Rooms() {
           </div>
         )}
       </div>
+      {showCreate && (
+        <CreateRoomModal
+          onClose={() => setShowCreate(false)}
+          onRoomCreated={() => { setShowCreate(false); fetchRooms(); }}
+        />
+      )}
     </div>
   );
 }

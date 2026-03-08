@@ -21,10 +21,16 @@ export default function Navbar() {
     } catch { setUser(null); }
   };
 
-  // Re-check auth on every route change (covers post-login redirect)
+  // Re-check on every route change
   useEffect(() => { checkAuth(); }, [location.pathname]);
 
-  // Also listen for storage events (other tabs)
+  // Listen for our custom auth event (fired from Login/OAuth2Callback same tab)
+  useEffect(() => {
+    window.addEventListener("auth:update", checkAuth);
+    return () => window.removeEventListener("auth:update", checkAuth);
+  }, []);
+
+  // Also catch other-tab storage changes
   useEffect(() => {
     window.addEventListener("storage", checkAuth);
     return () => window.removeEventListener("storage", checkAuth);
@@ -64,12 +70,8 @@ export default function Navbar() {
           <a href="#features" className="navbar__link">Features</a>
           <a href="#about"    className="navbar__link">About</a>
           <a href="#contact"  className="navbar__link">Contact</a>
-          {/* Rooms — only when logged in */}
           {user && (
-            <button
-              className="navbar__link navbar__link--rooms"
-              onClick={() => navigate("/rooms")}
-            >
+            <button className="navbar__link navbar__link--rooms" onClick={() => navigate("/rooms")}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
@@ -125,7 +127,7 @@ export default function Navbar() {
             </div>
           ) : (
             <>
-              <button className="navbar__btn navbar__btn--ghost"   onClick={() => navigate("/login")}>Log In</button>
+              <button className="navbar__btn navbar__btn--ghost"   onClick={() => navigate("/login")}>Sign In</button>
               <button className="navbar__btn navbar__btn--primary" onClick={() => navigate("/register")}>Get Started</button>
             </>
           )}
@@ -153,7 +155,7 @@ export default function Navbar() {
             <button className="navbar__btn navbar__btn--ghost" onClick={handleLogout}>Sign out</button>
           ) : (
             <>
-              <button className="navbar__btn navbar__btn--ghost"   onClick={() => { navigate("/login");    setMenuOpen(false); }}>Log In</button>
+              <button className="navbar__btn navbar__btn--ghost"   onClick={() => { navigate("/login");    setMenuOpen(false); }}>Sign In</button>
               <button className="navbar__btn navbar__btn--primary" onClick={() => { navigate("/register"); setMenuOpen(false); }}>Get Started</button>
             </>
           )}
