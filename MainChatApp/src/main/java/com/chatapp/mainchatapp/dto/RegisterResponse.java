@@ -15,5 +15,7 @@ public class RegisterResponse {
     private String name;
     private String email;
     private boolean isAccountVerified;
+    private String accessToken;
+    private String refreshToken;
 
 }

@@ -52,7 +52,7 @@ public class SecurityConfig {
                                 "/api/users/logout",
                                 "/api/admin-panel/**",
                                 "/oauth2/**",
-                                // ✅ Room list endpoints — authenticated via JWT in header
+                                // Room list endpoints — authenticated via JWT in header
                                 "/chat/room/public",
                                 "/chat/room/private"
                         ).permitAll()

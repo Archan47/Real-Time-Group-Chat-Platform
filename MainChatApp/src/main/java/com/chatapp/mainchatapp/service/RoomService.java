@@ -1,6 +1,5 @@
 package com.chatapp.mainchatapp.service;
 
-
 import com.chatapp.mainchatapp.dto.JoinRoomRequest;
 import com.chatapp.mainchatapp.dto.RoomRequest;
 import com.chatapp.mainchatapp.entity.AppUser;
@@ -23,82 +22,79 @@ public class RoomService {
     @Autowired
     private UserRepo userRepo;
 
-
-
     public ResponseEntity<?> createRoom(RoomRequest request) {
-
         AppUser appUser = userRepo.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User Not found"));
 
-        if (!appUser.isEnabled()){
-            return new ResponseEntity<>(appUser.getName()+", You are Blocked By Monitoring Team for Offensive act",
+        if (!appUser.isEnabled()) {
+            return new ResponseEntity<>(appUser.getName() + ", You are Blocked By Monitoring Team for Offensive act",
                     HttpStatus.FORBIDDEN);
         }
 
-        if (roomRepository.findByRoomId(request.getRoomId()) != null){
+        if (roomRepository.findByRoomId(request.getRoomId()) != null) {
             return ResponseEntity.badRequest().body("Room already exists!");
         }
+
         Room room = new Room();
         room.setRoomId(request.getRoomId());
         room.setCreatedBy(appUser.getId());
         room.setPrivate(request.isPrivateRoom());
+        if (request.getCategory() != null) room.setCategory(request.getCategory());
+        if (request.getPurpose()  != null) room.setPurpose(request.getPurpose());
         roomRepository.save(room);
-        return new ResponseEntity<>("Room Created Successfully",HttpStatus.CREATED);
+
+        return new ResponseEntity<>("Room Created Successfully", HttpStatus.CREATED);
     }
 
     public ResponseEntity<?> joinRoom(JoinRoomRequest roomRequest) {
+        AppUser appUser = userRepo.findById(roomRequest.getUserId())
+                .orElseThrow(() -> new RuntimeException("AppUser not found"));
 
-        AppUser appUser = userRepo.findById(roomRequest.getUserId()).
-                orElseThrow(() -> new RuntimeException("AppUser not found"));
-
-        if (!appUser.isEnabled()){
-            return new ResponseEntity<>(appUser.getName()+", You are Blocked By Monitoring Team for Offensive act\n" +
-                    "You can not join in Rooms",
-                    HttpStatus.FORBIDDEN);
+        if (!appUser.isEnabled()) {
+            return new ResponseEntity<>(appUser.getName() + ", You are Blocked By Monitoring Team for Offensive act\n" +
+                    "You can not join in Rooms", HttpStatus.FORBIDDEN);
         }
-        
+
         Room room = roomRepository.findByRoomId(roomRequest.getRoomId());
 
-        try{
-            if (room != null){
-                return ResponseEntity.status(HttpStatus.OK).body("You have entered in the room..");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (room != null) {
+            return ResponseEntity.status(HttpStatus.OK).body("You have entered in the room..");
         }
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room not Found !!");
     }
 
-
-
-
     public ResponseEntity<List<Message>> getMessages(String roomId, int page, int size) {
-
         Room room = roomRepository.findByRoomId(roomId);
 
-        if (room == null){
+        if (room == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         List<Message> messages = room.getMessages();
+        int start = Math.max(0, messages.size() - (page + 1) * size);
+        int end   = Math.min(messages.size(), start + size);
+        return ResponseEntity.status(HttpStatus.OK).body(messages.subList(start, end));
+    }
 
-        int start = Math.max(0,messages.size() - (page + 1) * size);
-        int end = Math.min(messages.size(), start + size);
-        List<Message> paginatedMessage =  messages.subList(start,end);
-        return ResponseEntity.status(HttpStatus.OK).body(paginatedMessage);
+    // Return all public rooms (strips messages for list view)
+    public ResponseEntity<List<Room>> getPublicRooms() {
+
+        List<Room> rooms = roomRepository.findByIsPrivate(false);
+        // Clear messages so we don't send heavy payloads in the list
+        rooms.forEach(r -> r.setMessages(List.of()));
+
+        return ResponseEntity.ok(rooms);
 
     }
 
-        public ResponseEntity<List<Room>> getPublicRooms() {
-            List<Room> rooms = roomRepository.findByIsPrivate(false);
-            // Clear messages so we don't send heavy payloads in the list
-            rooms.forEach(r -> r.setMessages(List.of()));
-            return ResponseEntity.ok(rooms);
-        }
+    // Return all private rooms metadata (no messages)
+    public ResponseEntity<List<Room>> getPrivateRooms() {
 
-        public ResponseEntity<List<Room>> getPrivateRooms() {
-            List<Room> rooms = roomRepository.findByIsPrivate(true);
-            rooms.forEach(r -> r.setMessages(List.of()));
-            return ResponseEntity.ok(rooms);
-        }
+        List<Room> rooms = roomRepository.findByIsPrivate(true);
+        rooms.forEach(r -> r.setMessages(List.of()));
+
+        return ResponseEntity.ok(rooms);
+
+    }
 }

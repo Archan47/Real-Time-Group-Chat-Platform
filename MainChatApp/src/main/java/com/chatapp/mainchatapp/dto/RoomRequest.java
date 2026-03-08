@@ -16,4 +16,7 @@ public class RoomRequest {
     @NotNull
     private boolean privateRoom;
 
+    private String category;
+    private String purpose;
+
 }
